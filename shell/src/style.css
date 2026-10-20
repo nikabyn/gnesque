@@ -1,7 +1,36 @@
-.topbar {
-    padding: 4px;
+/* prettier-ignore */
+:root {
+    --button-color: color-mix(in srgb, currentColor 10%, transparent);
+    --button-hover-color: color-mix(in srgb, currentColor 15%, transparent);
+    --button-active-color: color-mix(in srgb, currentColor 30%, transparent);
+    --button-checked-color: color-mix(in srgb, currentColor 30%, transparent);
+    --button-checked-hover-color: color-mix(in srgb, currentColor 35%, transparent);
+    --button-checked-active-color: color-mix(in srgb, currentColor 40%, transparent);
+    --opaque-button-default-bg: color-mix(in srgb, var(--window-bg-color) 85%, var(--window-fg-color));
 }
 
-button.compact {
+.osd,
+:root,
+window {
+    padding: none;
+}
+
+.button-target {
+    background: none;
+    border-radius: 0;
+}
+
+.button-target .button {
     padding: 2px 16px 2px 16px;
+    border-radius: 999px;
+    background-color: RGB(0 0 0 / 65%);
+}
+
+.button-target:hover .button {
+    background-color: var(--button-hover-color);
+}
+
+.button-target.keyboard-activating .button,
+.button-target:active .button {
+    background-color: var(--button-active-color);
 }

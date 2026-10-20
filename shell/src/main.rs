@@ -23,38 +23,54 @@ impl SimpleComponent for TopBarModel {
         gtk::Window {
             init_layer_shell: (),
             set_namespace: Some("gnesque-shell"),
-            set_layer: Layer::Overlay,
-            #[watch]
+            set_layer: Layer::Top,
+            // set_exclusive_zone: -1,
             auto_exclusive_zone_enable: (),
             set_anchor: (Edge::Left, true),
             set_anchor: (Edge::Right, true),
             set_anchor: (Edge::Top, true),
             set_anchor: (Edge::Bottom, false),
-            set_css_classes: &["osd", "topbar"],
+            set_css_classes: &["osd"],
 
 
             gtk::Box {
                 set_orientation: gtk::Orientation::Horizontal,
 
-                gtk::Button::with_label("Overview") {
-                    set_css_classes: &["flat", "pill", "compact"],
+                gtk::Button {
+                    set_css_classes: &["button-target"],
                     connect_clicked => TopBarMsg::ActionStart,
+
+                    gtk::Box {
+                        set_css_classes: &["button"],
+                        gtk::Label::new(Some("Overview")),
+                    },
                 },
 
                 gtk::Box { set_hexpand: true },
 
                 gtk::Button {
-                    set_css_classes: &["flat", "pill", "compact"],
-                    #[watch]
-                    set_label: &model.date.format("%d.%m.%Y %H:%M").unwrap_or("<error>".into()).to_string(),
+                    set_css_classes: &["button-target"],
                     connect_clicked => TopBarMsg::ActionCenter,
+
+                    gtk::Box {
+                        set_css_classes: &["button"],
+                        gtk::Label {
+                            #[watch]
+                            set_text: &model.date.format("%d.%m.%Y %H:%M").unwrap_or("<error>".into()).to_string(),
+                        }
+                    },
                 },
 
                 gtk::Box { set_hexpand: true },
 
-                gtk::Button::with_label("System Tray") {
-                    set_css_classes: &["flat", "pill", "compact"],
-                    connect_clicked => TopBarMsg::ActionEnd,
+                gtk::Button {
+                    set_css_classes: &["button-target"],
+                    connect_clicked => TopBarMsg::ActionStart,
+
+                    gtk::Box {
+                        set_css_classes: &["button", "pill"],
+                        gtk::Label::new(Some("System Tray")),
+                    },
                 },
             }
         }
