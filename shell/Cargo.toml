@@ -4,8 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-gtk = { version = "0.11.5", package = "gtk4", features = ["v4_22"] }
-gtk-layer-shell = { version = "0.8.1", package = "gtk4-layer-shell" }
-relm4 = { version = "0.11.0", features = ["libadwaita"] }
-relm4-components = { version = "0.11.0" }
-relm4-macros = "0.11.0"
+niri-ipc = { git = "https://github.com/niri-wm/niri.git", rev = "e19df12cf81f" }
+amane = { path = "../../amane" }
+chrono = "0.4.45"
+wgpu = { version = "30", default-features = false, features = [
+    "std",
+    "vulkan",
+    "wgsl",
+    "glsl",
+] }
