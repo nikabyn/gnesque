@@ -4,10 +4,10 @@ use std::{
     os::unix::net::UnixStream,
 };
 
-use amane::IpcCall;
+use gnudi::IpcCall;
 
 fn main() {
-    let socket_path = amane::ipc_socket();
+    let socket_path = gnudi::ipc_socket();
     let stream = UnixStream::connect(socket_path).unwrap();
 
     let call = IpcCall::new("topbar", &["toggle-floating".into()]);

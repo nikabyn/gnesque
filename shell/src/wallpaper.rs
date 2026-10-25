@@ -1,4 +1,4 @@
-use amane::{Fill, Full, Layer, LayerWindow, Monitor, Rectangle, Service, Size::Parent};
+use gnudi::{Fill, Full, Layer, LayerWindow, Monitor, Rectangle, Service, Size::Parent};
 
 use crate::services::ColorScheme;
 
@@ -9,13 +9,13 @@ pub fn wallpaper(monitor: &Monitor) -> LayerWindow {
     } else {
         "/home/nika/Pictures/F37-night.png"
     };
-    let image = amane::Image::cover(path).thumbnail(monitor.width, monitor.height);
+    let image = gnudi::Image::cover(path).thumbnail(monitor.width, monitor.height);
 
     LayerWindow::new()
         .width(Full)
         .height(Full)
         .layer(Layer::Background)
-        .space(amane::Zone::Ignore)
+        .space(gnudi::Zone::Ignore)
         .namespace("gnesque-wallpaper")
         .child(
             Rectangle::new()
@@ -32,7 +32,7 @@ pub fn backdrop(monitor: &Monitor) -> LayerWindow {
     } else {
         "/home/nika/Pictures/F37-night.png"
     };
-    let image = amane::Image::cover(path)
+    let image = gnudi::Image::cover(path)
         .thumbnail(monitor.width / 16, monitor.height / 16)
         .blurred(2);
 
@@ -40,7 +40,7 @@ pub fn backdrop(monitor: &Monitor) -> LayerWindow {
         .width(Full)
         .height(Full)
         .layer(Layer::Background)
-        .space(amane::Zone::Ignore)
+        .space(gnudi::Zone::Ignore)
         .namespace("gnesque-backdrop")
         .child(
             Rectangle::new()

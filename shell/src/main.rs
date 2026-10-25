@@ -1,4 +1,4 @@
-use amane::App;
+use gnudi::App;
 
 mod ipc;
 mod services;

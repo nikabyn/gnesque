@@ -1,11 +1,12 @@
 use std::{iter, time::Duration};
 
-use amane::{
-    Align::Center, Animation, Battery, Blend, Color, Full, Image, Justify::SpaceBetween, Layer,
+use chrono::{DateTime, Local};
+use color::{AlphaColor, Srgb};
+use gnudi::{
+    Align::Center, Animation, Battery, Blend, Full, Image, Justify::SpaceBetween, Layer,
     LayerWindow, Monitor, Padding, Parent, Radius, Rectangle, Row, Service, Text, Vertical, Weight,
     Widget, Workspaces, Zone, children, easing_linear,
 };
-use chrono::{DateTime, Local};
 
 use crate::services::{ColorScheme, Niri, NiriWindowExt};
 
@@ -56,20 +57,20 @@ impl Topbar {
 
 #[derive(Clone)]
 struct ColorTheme {
-    foreground: Color,
-    background: Color,
-    border: Color,
+    foreground: AlphaColor<Srgb>,
+    background: AlphaColor<Srgb>,
+    border: AlphaColor<Srgb>,
 }
 
 const COLOR_THEME_LIGHT: ColorTheme = ColorTheme {
-    foreground: Color::rgba(10, 10, 10, 255),
-    background: Color::rgba(250, 250, 250, 220),
-    border: Color::rgba(0, 0, 0, 15),
+    foreground: AlphaColor::from_rgba8(10, 10, 10, 255),
+    background: AlphaColor::from_rgba8(250, 250, 250, 220),
+    border: AlphaColor::from_rgba8(0, 0, 0, 15),
 };
 const COLOR_THEME_DARK: ColorTheme = ColorTheme {
-    foreground: Color::rgba(250, 250, 250, 255),
-    background: Color::rgba(30, 30, 30, 220),
-    border: Color::rgba(0, 0, 0, 50),
+    foreground: AlphaColor::from_rgba8(250, 250, 250, 255),
+    background: AlphaColor::from_rgba8(30, 30, 30, 220),
+    border: AlphaColor::from_rgba8(0, 0, 0, 50),
 };
 
 pub fn topbar(monitor: &Monitor) -> LayerWindow {
@@ -113,6 +114,8 @@ fn topbar_bar(radius: Radius, border_width: f32, color_theme: &ColorTheme) -> im
         .radius(radius)
         .border(border_width, color_theme.border)
         .fill(color_theme.background)
+        // TODO Do not render shadow behind transparent surfaces
+        // .shadow(Shadow::drop("#0000003c").blur(12.0).offset(0.0, 2.0))
         .child(
             Row::new(children![
                 widget_start(color_theme),
@@ -146,7 +149,7 @@ fn widget_start(color_theme: &ColorTheme) -> impl Widget + use<> {
                     .width(diameter)
                     .height(diameter)
                     .radius(Full);
-                circle.fill(color_theme.foreground.with_alpha(50))
+                circle.fill(color_theme.foreground.with_alpha(0.2))
             }
         })
         .map(|widget| Box::new(widget) as Box<dyn Widget>);
@@ -212,8 +215,8 @@ fn widget_center(color_theme: &ColorTheme) -> impl Widget + use<> {
 fn widget_end(color_theme: &ColorTheme) -> impl Widget + use<> {
     let battery = Battery::read();
     let color = match battery.percent() {
-        0..=5 => Color::RED,
-        6..=15 => Color::rgb(255, 255, 0),
+        0..=5 => color::palette::css::RED,
+        6..=15 => AlphaColor::from_rgb8(255, 255, 0),
         _ => color_theme.foreground,
     };
     let status = format!(

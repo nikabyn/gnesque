@@ -1,4 +1,4 @@
-use amane::{Bus, Monitor, Service, Value};
+use gnudi::{Bus, Monitor, Service, Value};
 use niri_ipc::Window;
 use wgpu::naga::FastHashMap;
 

@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 niri-ipc = { git = "https://github.com/niri-wm/niri.git", rev = "e19df12cf81f" }
-amane = { path = "../../amane" }
+gnudi = { path = "../../gnudi" }
 chrono = "0.4.45"
 wgpu = { version = "30", default-features = false, features = [
     "std",
@@ -13,3 +13,4 @@ wgpu = { version = "30", default-features = false, features = [
     "wgsl",
     "glsl",
 ] }
+color = { git = "https://github.com/linebender/color.git", rev = "943c533f229aa75ce176b7825351710cdc2d577a" }
