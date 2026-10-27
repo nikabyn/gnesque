@@ -13,4 +13,4 @@ wgpu = { version = "30", default-features = false, features = [
     "wgsl",
     "glsl",
 ] }
-color = { git = "https://github.com/linebender/color.git", rev = "943c533f229aa75ce176b7825351710cdc2d577a" }
+color = "0.3.3"

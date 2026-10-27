@@ -4,15 +4,17 @@ use chrono::{DateTime, Local};
 use color::{AlphaColor, Srgb};
 use gnudi::{
     Align::Center, Animation, Battery, Blend, Full, Image, Justify::SpaceBetween, Layer,
-    LayerWindow, Monitor, Padding, Parent, Radius, Rectangle, Row, Service, Text, Vertical, Weight,
-    Widget, Workspaces, Zone, children, easing_linear,
+    LayerWindow, Monitor, Padding, Parent, Radius, Rectangle, Row, Service, Shadow, Text, Vertical,
+    Weight, Widget, Workspaces, Zone, children, easing_linear,
 };
 
 use crate::services::{ColorScheme, Niri, NiriWindowExt};
 
 pub struct Topbar {
     floating: bool,
-    transition: Animation,
+    floating_transition: Animation,
+    hidden: bool,
+    hidden_transition: Animation,
     border_width: f32,
     color_theme: ColorTheme,
 }
@@ -21,7 +23,12 @@ impl Service for Topbar {
     fn new() -> Self {
         Self {
             floating: true,
-            transition: Animation::new(0.0)
+            floating_transition: Animation::new(0.0)
+                .duration(Duration::from_millis(150))
+                .easing(easing_linear),
+            hidden: false,
+            // TODO Sync with window resize animation of niri
+            hidden_transition: Animation::new(0.0)
                 .duration(Duration::from_millis(150))
                 .easing(easing_linear),
             border_width: 2.0,
@@ -34,13 +41,19 @@ impl Topbar {
     fn set_floating(&mut self, value: bool) {
         self.floating = value;
         let goal = if self.floating { 0.0 } else { 1.0 };
-        self.transition.to(goal);
+        self.floating_transition.to(goal);
+    }
+
+    fn set_hidden(&mut self, value: bool) {
+        self.hidden = value;
+        let goal = if self.hidden { 1.0 } else { 0.0 };
+        self.hidden_transition.to(goal);
     }
 
     pub fn margin(&self) -> Padding {
-        let margin_horizontal = Blend::blend(10.0, -2.0, self.transition.value());
-        let margin_top = Blend::blend(6.0, -2.0, self.transition.value());
-        let margin_bottom = Blend::blend(10.0, 0.0, self.transition.value());
+        let margin_horizontal = Blend::blend(10.0, -2.0, self.floating_transition.value());
+        let margin_top = Blend::blend(6.0, -2.0, self.floating_transition.value());
+        let margin_bottom = Blend::blend(10.0, 0.0, self.floating_transition.value());
 
         Padding {
             left: margin_horizontal,
@@ -51,7 +64,7 @@ impl Topbar {
     }
 
     pub fn radius(&self) -> Radius {
-        Blend::blend(12.0, 0.0, self.transition.value()).into()
+        Blend::blend(12.0, 0.0, self.floating_transition.value()).into()
     }
 }
 
@@ -76,10 +89,13 @@ const COLOR_THEME_DARK: ColorTheme = ColorTheme {
 pub fn topbar(monitor: &Monitor) -> LayerWindow {
     let mut bar = Topbar::write();
 
-    let floating = !Niri::read()
+    let (floating, hidden) = Niri::read()
         .focused_window()
-        .is_some_and(|window| window.is_maximised(monitor));
+        .map(|window| (!window.is_maximised(monitor), window.is_fullscreen(monitor)))
+        .unwrap_or((true, false));
+
     bar.set_floating(floating);
+    bar.set_hidden(hidden);
 
     bar.color_theme = if *ColorScheme::read() == ColorScheme::Light {
         COLOR_THEME_LIGHT
@@ -87,12 +103,14 @@ pub fn topbar(monitor: &Monitor) -> LayerWindow {
         COLOR_THEME_DARK
     };
 
-    let margin = topbar_margin(bar.margin());
+    const HEIGHT: f32 = 48.0;
+
+    let margin = topbar_margin(bar.margin(), -(bar.hidden_transition.value() * HEIGHT));
     let content = topbar_bar(bar.radius(), bar.border_width, &bar.color_theme);
 
     LayerWindow::new()
         .width(Full)
-        .height(48.0)
+        .height(HEIGHT)
         .anchor_vertical(Vertical::Top)
         .layer(Layer::Top)
         .space(Zone::Reserve)
@@ -100,14 +118,17 @@ pub fn topbar(monitor: &Monitor) -> LayerWindow {
         .namespace("gnesque-topbar")
 }
 
-fn topbar_margin(margin: Padding) -> Rectangle {
+fn topbar_margin(margin: Padding, offset_y: f32) -> Rectangle {
     Rectangle::new()
         .width(Parent)
         .height(Parent)
         .padding(margin)
+        .translate(0.0, offset_y)
 }
 
 fn topbar_bar(radius: Radius, border_width: f32, color_theme: &ColorTheme) -> impl Widget + use<> {
+    // TODO: Set background effect blur region
+
     Rectangle::new()
         .width(Parent)
         .height(Parent)
@@ -115,7 +136,11 @@ fn topbar_bar(radius: Radius, border_width: f32, color_theme: &ColorTheme) -> im
         .border(border_width, color_theme.border)
         .fill(color_theme.background)
         // TODO Do not render shadow behind transparent surfaces
-        // .shadow(Shadow::drop("#0000003c").blur(12.0).offset(0.0, 2.0))
+        .shadow(
+            Shadow::drop(AlphaColor::new([0.0, 0.0, 0.0, 0.2]))
+                .blur(10.0)
+                .offset(0.0, 2.0),
+        )
         .child(
             Row::new(children![
                 widget_start(color_theme),
@@ -205,7 +230,7 @@ fn widget_center(color_theme: &ColorTheme) -> impl Widget + use<> {
                 .color(color_theme.foreground),
             Text::new(&formatted_time.time)
                 .weight(Weight::Medium)
-                .tabular_numerics(true)
+                // .tabular_numerics(true)
                 .color(color_theme.foreground),
         ])
         .gap(10.0),
@@ -224,6 +249,12 @@ fn widget_end(color_theme: &ColorTheme) -> impl Widget + use<> {
         if battery.charging() { "+" } else { "" },
         battery.percent()
     );
+
+    // let height = Text::new(status)
+    //     .weight(Weight::Medium)
+    //     .color(color)
+    //     .height();
+
     button().child(Text::new(status).weight(Weight::Medium).color(color))
 }
 
@@ -231,6 +262,7 @@ fn button() -> Rectangle {
     Rectangle::new()
         .width(100.0)
         .height(Parent)
+        // .fill(color::palette::css::RED)
         .padding(12.0)
         .align_child(Center, Center)
 }

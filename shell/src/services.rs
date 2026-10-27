@@ -107,11 +107,18 @@ impl Niri {
 }
 
 pub trait NiriWindowExt {
+    fn is_fullscreen(&self, monitor: &Monitor) -> bool;
     fn is_maximised(&self, monitor: &Monitor) -> bool;
 }
 
 impl NiriWindowExt for niri_ipc::Window {
+    fn is_fullscreen(&self, monitor: &Monitor) -> bool {
+        self.layout.window_size.1 as i64 == monitor.height as i64
+            && self.layout.window_size.0 as i64 == monitor.width as i64
+    }
+
     fn is_maximised(&self, monitor: &Monitor) -> bool {
-        self.layout.window_size.0 as i64 == monitor.width as i64
+        self.layout.window_size.1 as i64 != monitor.height as i64
+            && self.layout.window_size.0 as i64 == monitor.width as i64
     }
 }

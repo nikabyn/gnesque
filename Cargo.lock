@@ -320,13 +320,7 @@ dependencies = [
 [[package]]
 name = "color"
 version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ec7c5eb7a16992b1904d76c517d170ab353b0e0b3d5a0c81a8a0cd1037893cf"
-
-[[package]]
-name = "color"
-version = "0.3.3"
-source = "git+https://github.com/linebender/color.git?rev=943c533f229aa75ce176b7825351710cdc2d577a#943c533f229aa75ce176b7825351710cdc2d577a"
+source = "git+https://github.com/linebender/color?rev=943c533f229aa75ce176b7825351710cdc2d577a#943c533f229aa75ce176b7825351710cdc2d577a"
 
 [[package]]
 name = "concurrent-queue"
@@ -621,7 +615,7 @@ name = "gnesque-shell"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "color 0.3.3 (git+https://github.com/linebender/color.git?rev=943c533f229aa75ce176b7825351710cdc2d577a)",
+ "color",
  "gnudi",
  "niri-ipc",
  "wgpu",
@@ -631,7 +625,7 @@ dependencies = [
 name = "gnudi"
 version = "0.1.2"
 dependencies = [
- "color 0.3.3 (git+https://github.com/linebender/color.git?rev=943c533f229aa75ce176b7825351710cdc2d577a)",
+ "color",
  "fontconfig",
  "inotify",
  "libpulse-binding",
@@ -1120,7 +1114,7 @@ version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "839c8299360d2e998bdb106dc0a6cd71dcc5f4df51df1b620361bf50e283cca6"
 dependencies = [
- "color 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "color",
  "kurbo",
  "linebender_resource_handle",
  "smallvec",

@@ -1,3 +1,6 @@
 [workspace]
 members = ["server", "shell"]
 resolver = "3"
+
+[patch.crates-io]
+color = { git = "https://github.com/linebender/color", rev = "943c533f229aa75ce176b7825351710cdc2d577a" }
